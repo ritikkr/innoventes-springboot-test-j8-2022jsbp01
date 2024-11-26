@@ -3,6 +3,7 @@ package com.innoventes.test.app.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.innoventes.test.app.dto.CompanyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,5 +53,47 @@ public class CompanyServiceImpl implements CompanyService {
 						String.format(serviceHelper.getLocalizedMessage(ApplicationErrorCodes.COMPANY_NOT_FOUND), id),
 						ApplicationErrorCodes.COMPANY_NOT_FOUND));
 		companyRepository.deleteById(existingCompanyRecord.getId());
+	}
+
+	@Override
+	public Company getCompanyById(Long id) {
+		Company existingCompanyRecord = companyRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format(serviceHelper.getLocalizedMessage(ApplicationErrorCodes.COMPANY_NOT_FOUND), id),
+						ApplicationErrorCodes.COMPANY_NOT_FOUND));
+		return existingCompanyRecord;
+	}
+
+	@Override
+	public Company getCompanyByCode(String code) {
+		Company existingCompanyRecord = companyRepository.findByCompanyCode(code)
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format(serviceHelper.getLocalizedMessage(ApplicationErrorCodes.COMPANY_NOT_FOUND), code),
+						ApplicationErrorCodes.COMPANY_NOT_FOUND));
+
+		return existingCompanyRecord;
+	}
+
+	@Override
+	public Company updateCompanyDetails(Long id, CompanyDTO companyDTO) {
+		Company existingCompanyRecord = companyRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format(serviceHelper.getLocalizedMessage(ApplicationErrorCodes.COMPANY_NOT_FOUND), id),
+						ApplicationErrorCodes.COMPANY_NOT_FOUND));
+
+		if(!companyDTO.getCompanyName().equalsIgnoreCase("")){
+			existingCompanyRecord.setCompanyName(companyDTO.getCompanyName());
+		}
+		if(!companyDTO.getEmail().equalsIgnoreCase("")){
+			existingCompanyRecord.setEmail(companyDTO.getEmail());
+		}
+		if(!companyDTO.getWebSiteURL().equalsIgnoreCase("")){
+			existingCompanyRecord.setWebSiteURL(companyDTO.getWebSiteURL());
+		}
+		if(companyDTO.getStrength() > 0){
+			existingCompanyRecord.setStrength(companyDTO.getStrength());
+		}
+
+		return companyRepository.save(existingCompanyRecord);
 	}
 }
